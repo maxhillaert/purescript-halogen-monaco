@@ -1,0 +1,34 @@
+{
+  "name": "purescript-halogen-monaco",
+  "version": "1.0.0",
+  "description": "Halogen bindings for monaco editor",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "editorbasic": "pulp browserify --include example/src --main EditorBasic --to public/editorbasic.js",
+    "build": "npm run editorbasic",
+    "serve": "node script/serve.js",
+    "ide": "purs ide server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maxhillaert/purescript-halogen-monaco.git"
+  },
+  "author": "Max Hillaert",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/maxhillaert/purescript-halogen-monaco/issues"
+  },
+  "devDependencies": {
+    "express": "^4.15.4"
+  },
+  "dependencies": {
+    "pulp": "^11.0.2",
+    "purescript": "^0.11.6",
+    "purescript-psa": "^0.5.1"
+  },
+  "homepage": "https://github.com/maxhillaert/purescript-halogen-monaco#readme"
+  
+}
