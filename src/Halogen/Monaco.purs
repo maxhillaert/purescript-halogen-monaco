@@ -10,7 +10,7 @@ import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Exception (EXCEPTION)
 import Control.Monad.Maybe.Trans (MaybeT)
 import DOM (DOM)
-import Data.Foldable (elem)
+import Data.Foldable (elem, for_)
 import Data.Identity (Identity(..))
 import Data.Maybe (Maybe(Nothing, Just))
 import Data.Maybe (Maybe)
@@ -62,35 +62,10 @@ editor =
   eval (Init options next) = do 
     el' <- H.getHTMLElementRef (H.RefLabel "monacoEditor")
     H.modify (\s -> s{ editor = Nothing})
-    let e' = do 
-                el <- el'
-                e <- H.liftAff (ME.create options el)
-                pure e
-
-    H.modify (\s -> s{editor=e'})    
+    for_ el' \el -> do
+        e <- H.liftAff (ME.create options el)
+        H.modify (\s -> s{editor=Just e})
     pure next
 
-    --el' <- H.getHTMLElementRef (H.RefLabel "monacoEditor")
-    --Maybe.
-    --x <- ME.create options el'
-  
-   
-     {- el <-  
-     let newE = do 
-                    el' <- el
-                    let e = ME.create options el'
-                    pure 
 
-     H.modify (\s -> s{editor=newE})
-        
-     pure next -}
-{- 
-    case el of
-        Nothing -> pure unit
-        Just el' -> do
-                    let e = ME.create options el'
-                    e
-   -}
-   -- pure next
-   
   
