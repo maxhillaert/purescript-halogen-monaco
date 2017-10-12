@@ -2,8 +2,8 @@
   "name": "purescript-halogen-monaco",
   "version": "1.0.0",
   "description": "Halogen bindings for monaco editor",
-  "main": "index.js",
   "directories": {
+    "example": "example",
     "test": "test"
   },
   "scripts": {
