@@ -1,12 +1,19 @@
 module EditorBasic where
 
 import Prelude
-import Control.Monad.Eff (Eff)
-import Halogen.Aff as HA
-import Halogen.VDom.Driver (runUI)
-import Halogen.Monaco as B
 
-main :: Eff (HA.HalogenEffects ()) Unit
+import Control.Monad.Eff (Eff)
+import Debug.Trace (trace)
+import Halogen.Aff as HA
+import Halogen.Monaco as B
+import Halogen.VDom.Driver (runUI)
+import Monaco.Types (MONACO, defaultConstuctorOptions)
+
+
+main :: Eff (HA.HalogenEffects (monaco :: MONACO)) Unit
 main = HA.runHalogenAff do
   body <- HA.awaitBody
-  runUI B.myButton unit body
+  io <- runUI B.editor unit body
+  let opts = defaultConstuctorOptions
+  r <- io.query (B.Init opts unit)
+  pure r

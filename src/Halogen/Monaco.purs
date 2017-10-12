@@ -1,22 +1,43 @@
 module Halogen.Monaco where
 
 import Prelude
-import Data.Maybe (Maybe(..))
+
+import Control.Monad.Aff (Aff, makeAff)
+import Control.Monad.Aff as A
+import Control.Monad.Aff.Class (liftAff)
+import Control.Monad.Aff.Class as AC
+import Control.Monad.Eff (Eff)
+import Control.Monad.Eff.Exception (EXCEPTION)
+import Control.Monad.Maybe.Trans (MaybeT)
+import DOM (DOM)
+import Data.Foldable (elem)
+import Data.Identity (Identity(..))
+import Data.Maybe (Maybe(Nothing, Just))
+import Data.Maybe (Maybe)
+import Debug.Trace (traceAnyM)
 import Halogen as H
 import Halogen.HTML as HH
-import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
+import Monaco.Editor as ME
+import Monaco.Types (EditorConstructionOptions, MONACO)
+import Monaco.Types as MT
 
-type State = Boolean
+type EditorState =
+  { editor ∷ Maybe MT.Editor
+--   , width ∷ Int
+--   , height ∷ Int
+  }
 
-data Query a
-  = Toggle a
-  | IsOn (Boolean -> a)
+-- | Effects embedding the Ace editor requires.
+type MonacoEffects eff = (monaco :: MONACO, exception :: EXCEPTION, dom :: DOM | eff)
 
-data Message = Toggled Boolean
+data EditorQuery a = 
+    Init EditorConstructionOptions a
 
-myButton :: forall m. H.Component HH.HTML Query Unit Message m
-myButton =
+data EditorMessage = Initialized 
+
+editor :: forall eff. H.Component HH.HTML EditorQuery Unit EditorMessage (Aff (MonacoEffects eff))
+editor =
   H.component
     { initialState: const initialState
     , render
@@ -25,28 +46,51 @@ myButton =
     }
   where
 
-  initialState :: State
-  initialState = false
+  initialState :: EditorState
+  initialState = {
+      editor: Nothing
+  }
 
-  render :: State -> H.ComponentHTML Query
+  render :: EditorState -> H.ComponentHTML EditorQuery
   render state =
-    let
-      label = if state then "On" else "Off"
-    in
-      HH.button
-        [ HP.title label
-        , HE.onClick (HE.input_ Toggle)
-        ]
-        [ HH.text label ]
+    HH.div
+            [ HP.ref $ H.RefLabel "monacoEditor"
+            ]
+            []
 
-  eval :: Query ~> H.ComponentDSL State Query Message m
-  eval = case _ of
-    Toggle next -> do
-      state <- H.get
-      let nextState = not state
-      H.put nextState
-      H.raise $ Toggled nextState
-      pure next
-    IsOn reply -> do
-      state <- H.get
-      pure (reply state)
+  eval :: EditorQuery ~> H.ComponentDSL EditorState EditorQuery EditorMessage (Aff (MonacoEffects eff))
+  eval (Init options next) = do 
+    el' <- H.getHTMLElementRef (H.RefLabel "monacoEditor")
+    H.modify (\s -> s{ editor = Nothing})
+    let e' = do 
+                el <- el'
+                e <- H.liftAff (ME.create options el)
+                pure e
+
+    H.modify (\s -> s{editor=e'})    
+    pure next
+
+    --el' <- H.getHTMLElementRef (H.RefLabel "monacoEditor")
+    --Maybe.
+    --x <- ME.create options el'
+  
+   
+     {- el <-  
+     let newE = do 
+                    el' <- el
+                    let e = ME.create options el'
+                    pure 
+
+     H.modify (\s -> s{editor=newE})
+        
+     pure next -}
+{- 
+    case el of
+        Nothing -> pure unit
+        Just el' -> do
+                    let e = ME.create options el'
+                    e
+   -}
+   -- pure next
+   
+  
