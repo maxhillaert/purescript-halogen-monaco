@@ -9,7 +9,7 @@
   "dependencies": {
     "purescript-halogen": "^3.0.1",
     "purescript-halogen-css": "^7.0.0",
-    "purescript-monaco": "*"
+    "purescript-monaco": "0.0.7-alpha"
   },
   "devDependencies": {
     "purescript-debug": "^3.0.0",
